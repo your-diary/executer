@@ -5,6 +5,9 @@ package main
 // import "fmt"
 import "os"
 
+// import "strings"
+import "path"
+
 import "executer/option"
 import "executer/util"
 import "executer/exec"
@@ -29,16 +32,81 @@ func main() {
 	}
 	util.DebugPrint(option, isDebugMode)
 
-	var execOption = exec.Option{
-		IsCompileMode:              false,
-		Command:                    "python3",
-		CompileOptions:             []string{"--version"},
-		Arguments:                  []string{},
-		ExecOptions:                nil,
-		ExitStatusWhenCompileError: exitStatusWhenCompileError,
-		IsDebugMode:                isDebugMode,
-	}
+	var ext = path.Ext(option.Source)   //`.py`
+	var base = path.Base(option.Source) //`main.py`
 
-	exec.Execute(execOption)
+	if ext == ".py" {
+
+		var execOption = exec.Option{
+			IsCompileMode:              false,
+			Command:                    "python3",
+			CompileOptions:             option.CompileArgs,
+			Arguments:                  []string{option.Source},
+			ExecOptions:                option.ExecArgs,
+			ExitStatusWhenCompileError: exitStatusWhenCompileError,
+			IsDebugMode:                isDebugMode,
+		}
+
+		exec.Execute(execOption)
+
+		os.Exit(0)
+
+	} else if ext == ".rs" {
+
+		if base == "main.rs" {
+
+			if option.IsOnlyCompileMode {
+
+				var execOption = exec.Option{
+					IsCompileMode:              true,
+					Command:                    "cargo",
+					CompileOptions:             append([]string{"check", "--quiet"}, option.CompileArgs...),
+					Arguments:                  nil,
+					ExecOptions:                nil,
+					ExitStatusWhenCompileError: exitStatusWhenCompileError,
+					IsDebugMode:                isDebugMode,
+				}
+
+				exec.Execute(execOption)
+
+			} else {
+				var execOption = exec.Option{
+					IsCompileMode:              false,
+					Command:                    "cargo",
+					CompileOptions:             append([]string{"run", "--quiet"}, option.CompileArgs...),
+					Arguments:                  nil,
+					ExecOptions:                option.ExecArgs,
+					ExitStatusWhenCompileError: exitStatusWhenCompileError,
+					IsDebugMode:                isDebugMode,
+				}
+
+				exec.Execute(execOption)
+
+			}
+
+		} else {
+
+			var execOption = exec.Option{
+				IsCompileMode:              true,
+				Command:                    "cargo",
+				CompileOptions:             append([]string{"check", "--quiet"}, option.CompileArgs...),
+				Arguments:                  nil,
+				ExecOptions:                nil,
+				ExitStatusWhenCompileError: exitStatusWhenCompileError,
+				IsDebugMode:                isDebugMode,
+			}
+
+			exec.Execute(execOption)
+
+		}
+
+		os.Exit(0)
+
+	} else {
+
+		util.Eprintf("Unsupported file type: %v\n", ext)
+		os.Exit(exitStatusWhenCompileError)
+
+	}
 
 }
