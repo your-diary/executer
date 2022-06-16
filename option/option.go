@@ -24,6 +24,24 @@ var optionList = []string{
 	"--help",
 }
 
+func extractArgumentsToOption(args []string, i int) ([]string, int) {
+
+	var ret = make([]string, 0)
+
+	for i < len(args)-1 {
+		i++
+		var arg = args[i]
+		if slices.Contains(optionList, arg) {
+			i--
+			break
+		}
+		ret = append(ret, arg)
+	}
+
+	return ret, i
+
+}
+
 func printUsage() {
 	fmt.Println(`Usage
   executer <file> [<option(s)>]
@@ -48,48 +66,38 @@ func Parse(args []string) (Options, error) {
 		i++
 		var arg = args[i]
 		switch arg {
+
 		case "-h", "--help":
 			printUsage()
 			exit(0)
+
 		case "--only-compile":
 			ret.IsOnlyCompileMode = true
+
 		case "--only-execute":
 			ret.IsOnlyExecuteMode = true
+
 		case "--time":
 			ret.ShouldMeasureTime = true
+
 		case "--args":
-			if i == len(args)-1 {
+			ret.ExecArgs, i = extractArgumentsToOption(args, i)
+			if len(ret.ExecArgs) == 0 {
 				return ret, fmt.Errorf("`--args` with no argument")
 			}
-			ret.ExecArgs = []string{}
-			for i < len(args)-1 {
-				i++
-				var arg = args[i]
-				if slices.Contains(optionList, arg) {
-					i--
-					break
-				}
-				ret.ExecArgs = append(ret.ExecArgs, arg)
-			}
+
 		case "--compile-args":
-			if i == len(args)-1 {
+			ret.CompileArgs, i = extractArgumentsToOption(args, i)
+			if len(ret.CompileArgs) == 0 {
 				return ret, fmt.Errorf("`--compile-args` with no argument")
 			}
-			ret.CompileArgs = []string{}
-			for i < len(args)-1 {
-				i++
-				var arg = args[i]
-				if slices.Contains(optionList, arg) {
-					i--
-					break
-				}
-				ret.CompileArgs = append(ret.CompileArgs, arg)
-			}
+
 		default:
 			if ret.Source != "" {
 				return ret, fmt.Errorf("more than one sources specified: [ %v, %v ]", ret.Source, arg)
 			}
 			ret.Source = arg
+
 		}
 	}
 
