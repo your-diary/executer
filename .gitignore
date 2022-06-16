@@ -11,3 +11,5 @@ node_modules/
 old/
 used/
 sandbox/
+
+yrun.sh
