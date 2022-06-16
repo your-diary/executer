@@ -8,6 +8,8 @@ import "os"
 import "os/signal"
 import "os/exec"
 
+import "executer/option"
+
 const (
 	isDebugModeDefault         = 1
 	exitStatusWhenCompileError = 100
@@ -114,6 +116,13 @@ func main() {
 	if (isDebugModeDefault != 0) || (os.Getenv("EXECUTER_DEBUG") == "1") {
 		isDebugMode = true
 	}
+
+	var option, err = option.Parse(os.Args)
+	if err != nil {
+		eprintf("Failed to parse command-line options: %v\n", err)
+		os.Exit(exitStatusWhenCompileError)
+	}
+	fmt.Println(option)
 
 	var execOption = ExecOption{
 		isCompileMode:  false,
