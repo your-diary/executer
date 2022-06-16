@@ -21,7 +21,19 @@ func Test_misc(t *testing.T) {
 
 	t.Run("All options.", func(t *testing.T) {
 
-		var args = []string{"$0", "main.go", "--time", "--only-compile", "--only-execute", "--args", "a", "b", "--compile-args", "c", "d"}
+		var args = []string{
+			"$0",
+			"main.go",
+			"--time",
+			"--only-compile",
+			"--only-execute",
+			"--args",
+			"a",
+			"b",
+			"--compile-args",
+			"c",
+			"d",
+		}
 
 		var ret, err = Parse(args)
 
