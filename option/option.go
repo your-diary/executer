@@ -2,6 +2,7 @@ package option
 
 import "os"
 import "fmt"
+import "strings"
 
 import "golang.org/x/exp/slices"
 
@@ -93,6 +94,9 @@ func Parse(args []string) (Options, error) {
 			}
 
 		default:
+			if strings.HasPrefix(arg, "-") {
+				return ret, fmt.Errorf("unknown option: [ %v ]", arg)
+			}
 			if ret.Source != "" {
 				return ret, fmt.Errorf("more than one sources specified: [ %v, %v ]", ret.Source, arg)
 			}

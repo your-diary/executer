@@ -2,6 +2,7 @@ package option
 
 import "testing"
 import "fmt"
+import "strings"
 
 import "golang.org/x/exp/slices"
 
@@ -152,8 +153,21 @@ func Test_source(t *testing.T) {
 		var _, err = Parse(args)
 		fmt.Println(err)
 
-		if err == nil {
-			t.FailNow()
+		if !strings.HasPrefix(err.Error(), "more than one sources specified") {
+			t.Fatal(err)
+		}
+
+	})
+
+	t.Run("Unknown option.", func(t *testing.T) {
+
+		var args = []string{"$0", "main.go", "--main.py"}
+
+		var _, err = Parse(args)
+		fmt.Println(err)
+
+		if !strings.HasPrefix(err.Error(), "unknown option") {
+			t.Fatal(err)
 		}
 
 	})
