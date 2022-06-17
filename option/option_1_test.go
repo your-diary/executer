@@ -78,19 +78,6 @@ func Test_help(t *testing.T) {
 
 func Test_args(t *testing.T) {
 
-	t.Run("`err != nil` when `--args` has no argument", func(t *testing.T) {
-
-		var args = []string{"$0", "--time", "--args"}
-
-		var _, err = Parse(args)
-		fmt.Println(err)
-
-		if err == nil {
-			t.FailNow()
-		}
-
-	})
-
 	t.Run("`--args` with arguments", func(t *testing.T) {
 
 		var args = []string{"$0", "--args", "a", "b", "--time", "main.go"}
@@ -111,19 +98,6 @@ func Test_args(t *testing.T) {
 }
 
 func Test_compileArgs(t *testing.T) {
-
-	t.Run("`err != nil` when `--compile-args` has no argument", func(t *testing.T) {
-
-		var args = []string{"$0", "--time", "--compile-args"}
-
-		var _, err = Parse(args)
-		fmt.Println(err)
-
-		if err == nil {
-			t.FailNow()
-		}
-
-	})
 
 	t.Run("`--compile-args` with arguments", func(t *testing.T) {
 
@@ -179,7 +153,7 @@ func Test_source(t *testing.T) {
 		var _, err = Parse(args)
 		fmt.Println(err)
 
-		if err == nil {
+		if !strings.HasPrefix(err.Error(), "no source specified") {
 			t.FailNow()
 		}
 

@@ -48,12 +48,12 @@ func printUsage() {
   executer <file> [<option(s)>]
 
 Options
-  --compile-args <arg(s)>    #Passes <arg(s)> when compilation.
-  --args <arg(s)>            #Passes <arg(s)> when execution.
-  --only-compile             #Just compiles and skips execution.
-  --only-execute             #Just executes and skips compilation.
-  --time                     #Measures the execution time.
-  -h/--help                  #Shows this help.`)
+  --compile-args [<arg(s)>]    #Passes <arg(s)> when compilation.
+  --args [<arg(s)>]            #Passes <arg(s)> when execution.
+  --only-compile               #Just compiles and skips execution.
+  --only-execute               #Just executes and skips compilation.
+  --time                       #Measures the execution time.
+  -h/--help                    #Shows this help.`)
 }
 
 var exit func(int) = os.Exit //for mock
@@ -83,15 +83,9 @@ func Parse(args []string) (Options, error) {
 
 		case "--args":
 			ret.ExecArgs, i = extractArgumentsToOption(args, i)
-			if len(ret.ExecArgs) == 0 {
-				return ret, fmt.Errorf("`--args` with no argument")
-			}
 
 		case "--compile-args":
 			ret.CompileArgs, i = extractArgumentsToOption(args, i)
-			if len(ret.CompileArgs) == 0 {
-				return ret, fmt.Errorf("`--compile-args` with no argument")
-			}
 
 		default:
 			if strings.HasPrefix(arg, "-") {
