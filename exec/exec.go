@@ -77,6 +77,7 @@ func Execute(o Option) {
 			util.Eprintln("Failed to send SIGINT.")
 			exit(exitStatusOnFailure)
 		}
+		<-done
 		exit(exitStatusOnFailure)
 	}
 
