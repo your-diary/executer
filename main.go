@@ -32,14 +32,10 @@ func main() {
 	}
 	util.DebugPrint(option, isDebugMode)
 
-	var ext = path.Ext(option.Source)   //`.py`
-	var base = path.Base(option.Source) //`main.py`
-
-	if ext == ".py" {
-
-		var execOption = exec.Option{
-			IsCompileMode:              false,
-			Command:                    "python3",
+	var createExecOption = func(command string, isCompileMode bool) exec.Option {
+		return exec.Option{
+			IsCompileMode:              isCompileMode,
+			Command:                    command,
 			CompileOptions:             option.CompileArgs,
 			Arguments:                  []string{option.Source},
 			ExecOptions:                option.ExecArgs,
@@ -47,8 +43,16 @@ func main() {
 			ExitStatusWhenCompileError: exitStatusWhenCompileError,
 			IsDebugMode:                isDebugMode,
 		}
+	}
 
-		exec.Execute(execOption)
+	var ext = path.Ext(option.Source)   //`.py`
+	var base = path.Base(option.Source) //`main.py`
+
+	if ext == ".py" {
+
+		var o = createExecOption("python3", false)
+
+		exec.Execute(o)
 
 		os.Exit(0)
 
@@ -58,50 +62,32 @@ func main() {
 
 			if option.IsOnlyCompileMode {
 
-				var execOption = exec.Option{
-					IsCompileMode:              true,
-					Command:                    "cargo",
-					CompileOptions:             append([]string{"check", "--quiet"}, option.CompileArgs...),
-					Arguments:                  nil,
-					ExecOptions:                nil,
-					ShouldMeasureTime:          option.ShouldMeasureTime,
-					ExitStatusWhenCompileError: exitStatusWhenCompileError,
-					IsDebugMode:                isDebugMode,
-				}
+				var o = createExecOption("cargo", true)
+				o.CompileOptions = append([]string{"check", "--quiet"}, option.CompileArgs...)
+				o.Arguments = nil
+				o.ExecOptions = nil
 
-				exec.Execute(execOption)
+				exec.Execute(o)
 
 			} else {
 
-				var execOption = exec.Option{
-					IsCompileMode:              false,
-					Command:                    "cargo",
-					CompileOptions:             append([]string{"run", "--quiet"}, option.CompileArgs...),
-					Arguments:                  nil,
-					ExecOptions:                option.ExecArgs,
-					ShouldMeasureTime:          option.ShouldMeasureTime,
-					ExitStatusWhenCompileError: exitStatusWhenCompileError,
-					IsDebugMode:                isDebugMode,
-				}
+				var o = createExecOption("cargo", false)
+				o.CompileOptions = append([]string{"run", "--quiet"}, option.CompileArgs...)
+				o.Arguments = nil
+				o.ExecOptions = option.ExecArgs
 
-				exec.Execute(execOption)
+				exec.Execute(o)
 
 			}
 
 		} else {
 
-			var execOption = exec.Option{
-				IsCompileMode:              true,
-				Command:                    "cargo",
-				CompileOptions:             append([]string{"check", "--quiet"}, option.CompileArgs...),
-				Arguments:                  nil,
-				ExecOptions:                nil,
-				ShouldMeasureTime:          option.ShouldMeasureTime,
-				ExitStatusWhenCompileError: exitStatusWhenCompileError,
-				IsDebugMode:                isDebugMode,
-			}
+			var o = createExecOption("cargo", true)
+			o.CompileOptions = append([]string{"check", "--quiet"}, option.CompileArgs...)
+			o.Arguments = nil
+			o.ExecOptions = nil
 
-			exec.Execute(execOption)
+			exec.Execute(o)
 
 		}
 
