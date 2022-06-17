@@ -5,6 +5,7 @@ import "errors"
 import "os"
 import "os/signal"
 import "os/exec"
+import "time"
 
 import "executer/util"
 
@@ -14,11 +15,23 @@ type Option struct {
 	CompileOptions             []string
 	Arguments                  []string
 	ExecOptions                []string
+	ShouldMeasureTime          bool
 	ExitStatusWhenCompileError int
 	IsDebugMode                bool
 }
 
 func Execute(o Option) {
+
+	var start = time.Now()
+	var exit = func(exitStatus int) {
+		var elapsedSeconds float64 = float64(time.Now().Sub(start).Milliseconds()) / 1000
+		if !o.IsCompileMode && (o.ShouldMeasureTime || o.IsDebugMode) {
+			util.Eprintf("\nElapsed: %.2f(s)\n", elapsedSeconds)
+		}
+		if exitStatus != 0 {
+			os.Exit(exitStatus)
+		}
+	}
 
 	var exitStatusOnFailure = 1
 	if o.IsCompileMode {
@@ -44,7 +57,7 @@ func Execute(o Option) {
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
 		util.Eprintf("Failed to execute the command: %v\n", err)
-		os.Exit(exitStatusOnFailure)
+		exit(exitStatusOnFailure)
 	}
 
 	var done = make(chan error)
@@ -62,18 +75,20 @@ func Execute(o Option) {
 		util.DebugPrint("\nSIGINT is caught.", o.IsDebugMode)
 		if err := cmd.Process.Signal(os.Interrupt); err != nil {
 			util.Eprintln("Failed to send SIGINT.")
-			os.Exit(exitStatusOnFailure)
+			exit(exitStatusOnFailure)
 		}
-		os.Exit(exitStatusOnFailure)
+		exit(exitStatusOnFailure)
 	}
 
 	if err != nil {
 		var e *exec.ExitError
 		if errors.As(err, &e) {
-			os.Exit(e.ProcessState.ExitCode())
+			exit(e.ProcessState.ExitCode())
 		} else {
-			os.Exit(exitStatusOnFailure)
+			exit(exitStatusOnFailure)
 		}
 	}
+
+	exit(0)
 
 }

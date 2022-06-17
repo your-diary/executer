@@ -43,6 +43,7 @@ func main() {
 			CompileOptions:             option.CompileArgs,
 			Arguments:                  []string{option.Source},
 			ExecOptions:                option.ExecArgs,
+			ShouldMeasureTime:          option.ShouldMeasureTime,
 			ExitStatusWhenCompileError: exitStatusWhenCompileError,
 			IsDebugMode:                isDebugMode,
 		}
@@ -63,6 +64,7 @@ func main() {
 					CompileOptions:             append([]string{"check", "--quiet"}, option.CompileArgs...),
 					Arguments:                  nil,
 					ExecOptions:                nil,
+					ShouldMeasureTime:          option.ShouldMeasureTime,
 					ExitStatusWhenCompileError: exitStatusWhenCompileError,
 					IsDebugMode:                isDebugMode,
 				}
@@ -77,6 +79,7 @@ func main() {
 					CompileOptions:             append([]string{"run", "--quiet"}, option.CompileArgs...),
 					Arguments:                  nil,
 					ExecOptions:                option.ExecArgs,
+					ShouldMeasureTime:          option.ShouldMeasureTime,
 					ExitStatusWhenCompileError: exitStatusWhenCompileError,
 					IsDebugMode:                isDebugMode,
 				}
@@ -93,6 +96,7 @@ func main() {
 				CompileOptions:             append([]string{"check", "--quiet"}, option.CompileArgs...),
 				Arguments:                  nil,
 				ExecOptions:                nil,
+				ShouldMeasureTime:          option.ShouldMeasureTime,
 				ExitStatusWhenCompileError: exitStatusWhenCompileError,
 				IsDebugMode:                isDebugMode,
 			}
