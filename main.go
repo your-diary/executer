@@ -48,19 +48,48 @@ func main() {
 	var ext = path.Ext(option.Source)   //`.py`
 	var base = path.Base(option.Source) //`main.py`
 
-	if ext == ".py" {
+	switch ext {
 
-		var o = createExecOption("python3", false)
+	case ".py":
+		{
+			var o = createExecOption("python3", false)
+			exec.Execute(o)
+			os.Exit(0)
+		}
 
-		exec.Execute(o)
+	case ".sh":
+		{
+			var o = createExecOption("bash", false)
+			exec.Execute(o)
+			os.Exit(0)
+		}
 
-		os.Exit(0)
+	case ".rs":
+		{
 
-	} else if ext == ".rs" {
+			if base == "main.rs" {
 
-		if base == "main.rs" {
+				if option.IsOnlyCompileMode {
 
-			if option.IsOnlyCompileMode {
+					var o = createExecOption("cargo", true)
+					o.CompileOptions = append([]string{"check", "--quiet"}, option.CompileArgs...)
+					o.Arguments = nil
+					o.ExecOptions = nil
+
+					exec.Execute(o)
+
+				} else {
+
+					var o = createExecOption("cargo", false)
+					o.CompileOptions = append([]string{"run", "--quiet"}, option.CompileArgs...)
+					o.Arguments = nil
+					o.ExecOptions = option.ExecArgs
+
+					exec.Execute(o)
+
+				}
+
+			} else {
 
 				var o = createExecOption("cargo", true)
 				o.CompileOptions = append([]string{"check", "--quiet"}, option.CompileArgs...)
@@ -69,34 +98,17 @@ func main() {
 
 				exec.Execute(o)
 
-			} else {
-
-				var o = createExecOption("cargo", false)
-				o.CompileOptions = append([]string{"run", "--quiet"}, option.CompileArgs...)
-				o.Arguments = nil
-				o.ExecOptions = option.ExecArgs
-
-				exec.Execute(o)
-
 			}
 
-		} else {
-
-			var o = createExecOption("cargo", true)
-			o.CompileOptions = append([]string{"check", "--quiet"}, option.CompileArgs...)
-			o.Arguments = nil
-			o.ExecOptions = nil
-
-			exec.Execute(o)
+			os.Exit(0)
 
 		}
 
-		os.Exit(0)
-
-	} else {
-
-		util.Eprintf("Unsupported file type: %v\n", ext)
-		os.Exit(exitStatusWhenCompileError)
+	default:
+		{
+			util.Eprintf("Unsupported file type: %v\n", ext)
+			os.Exit(exitStatusWhenCompileError)
+		}
 
 	}
 
