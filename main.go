@@ -69,6 +69,21 @@ func main() {
 			os.Exit(0)
 		}
 
+	case "sql":
+		{
+			var o = createExecOption("sqlite3", false)
+			o.CompileOptions = append(
+				append(
+					[]string{":memory:", "-init", "", "-batch"},
+					o.CompileOptions...,
+				),
+				fmt.Sprintf(".read %v", s.Path),
+			)
+			o.Arguments = nil
+			exec.Execute(o)
+			os.Exit(0)
+		}
+
 	case "bats": //testing framework for Bash
 		{
 			var o = createExecOption("bats", false)
