@@ -99,6 +99,24 @@ func main() {
 			os.Exit(0)
 		}
 
+	case "ts":
+		{
+			if !option.IsOnlyExecuteMode {
+				var o = createExecOption("tsc", true)
+				o.CompileOptions = append([]string{"--build"}, option.CompileArgs...)
+				o.Arguments = nil
+				o.ExecOptions = nil
+				exec.Execute(o)
+			}
+			if !option.IsOnlyCompileMode {
+				var o = createExecOption("node", false)
+				o.CompileOptions = nil
+				o.Arguments = []string{fmt.Sprintf("%v/target/%v.js", s.Dir, s.Name)}
+				exec.Execute(o)
+			}
+			os.Exit(0)
+		}
+
 	case "go":
 		{
 			if strings.HasSuffix(s.Base, "_test.go") { //test files
