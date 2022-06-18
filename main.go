@@ -5,6 +5,7 @@ package main
 import "fmt"
 import "strings"
 import "os"
+import "runtime"
 
 import "executer/option"
 import "executer/util"
@@ -112,6 +113,41 @@ func main() {
 				var o = createExecOption("node", false)
 				o.CompileOptions = nil
 				o.Arguments = []string{fmt.Sprintf("%v/target/%v.js", s.Dir, s.Name)}
+				exec.Execute(o)
+			}
+			os.Exit(0)
+		}
+
+	case "c", "cpp":
+		{
+			var output = s.PathWoExt + ".out"
+			if !option.IsOnlyExecuteMode {
+				var o = func() exec.Option {
+
+					if runtime.GOOS == "darwin" {
+						if s.Ext == "c" {
+							return createExecOption("gcc-11", true)
+						}
+						return createExecOption("g++-11", true)
+					}
+
+					if s.Ext == "c" {
+						return createExecOption("gcc", true)
+					}
+					return createExecOption("g++", true)
+
+				}()
+				o.CompileOptions = append([]string{"-fdiagnostics-color=always", "-Wno-unused-result", "-Wfatal-errors", "-o", output}, option.CompileArgs...)
+				if s.Ext == "c" {
+					o.CompileOptions = append(o.CompileOptions, "-l", "m")
+				}
+				o.ExecOptions = nil
+				exec.Execute(o)
+			}
+			if !option.IsOnlyCompileMode {
+				var o = createExecOption(output, false)
+				o.CompileOptions = nil
+				o.Arguments = nil
 				exec.Execute(o)
 			}
 			os.Exit(0)
