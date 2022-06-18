@@ -117,6 +117,32 @@ func main() {
 			os.Exit(0)
 		}
 
+	case "java":
+		{
+			if option.IsOnlyCompileMode {
+				var o = createExecOption("gradle", true)
+				o.CompileOptions = append([]string{"build"}, option.CompileArgs...)
+				o.Arguments = nil
+				o.ExecOptions = nil
+				exec.Execute(o)
+			} else {
+				var o = createExecOption("gradle", false)
+				o.CompileOptions = append([]string{"run", "--quiet"}, option.CompileArgs...)
+				o.Arguments = nil
+				o.ExecOptions = func() []string { //To pass `a` and `b c`, we shall specify `['--args', '"a" "b c"']`.
+					if len(o.ExecOptions) == 0 {
+						return nil
+					}
+					for i := 0; i < len(o.ExecOptions); i++ {
+						o.ExecOptions[i] = fmt.Sprintf(`"%v"`, o.ExecOptions[i])
+					}
+					return []string{"--args", strings.Join(o.ExecOptions, " ")}
+				}()
+				exec.Execute(o)
+			}
+			os.Exit(0)
+		}
+
 	case "go":
 		{
 			if strings.HasSuffix(s.Base, "_test.go") { //test files
