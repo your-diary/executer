@@ -11,7 +11,7 @@ import "executer/util"
 import "executer/exec"
 
 const (
-	isDebugModeDefault         = 1
+	isDebugModeDefault         = 0
 	exitStatusWhenCompileError = 100
 )
 
