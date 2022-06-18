@@ -4,7 +4,9 @@ package main
 
 import "fmt"
 import "strings"
+import "errors"
 import "os"
+import "io"
 import "runtime"
 
 import "executer/option"
@@ -41,6 +43,46 @@ func main() {
 			ShouldMeasureTime:          option.ShouldMeasureTime,
 			ExitStatusWhenCompileError: exitStatusWhenCompileError,
 			IsDebugMode:                isDebugMode,
+		}
+	}
+
+	//yrun.sh
+	//We respect `yrun.sh` iff the following three conditions are met.
+	//1. It exists.
+	//2. It isn't empty.
+	//3. It doesn't consist only of comments.
+	{
+		var isFile = func(path string) bool {
+			if info, err := os.Stat(path); !errors.Is(err, os.ErrNotExist) && !info.IsDir() {
+				return true
+			}
+			return false
+		}
+		var file = "./yrun.sh"
+		if isFile(file) {
+
+			//checks if `./yrun.sh` is empty
+			var f, _ = os.Open(file)
+			defer f.Close()
+			var b, _ = io.ReadAll(f)
+			var lines = strings.Split(string(b), "\n")
+			var isYrunShEmpty = true
+			for _, line := range lines {
+				var l = strings.TrimSpace(line)
+				if !((l == "") || strings.HasPrefix(l, "#")) {
+					isYrunShEmpty = false
+					break
+				}
+			}
+
+			if !isYrunShEmpty {
+				var o = createExecOption("bash", false)
+				o.CompileOptions = nil
+				o.Arguments = append([]string{file}, o.Arguments...)
+				exec.Execute(o)
+				os.Exit(0)
+			}
+
 		}
 	}
 
