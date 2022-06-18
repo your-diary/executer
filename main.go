@@ -3,7 +3,6 @@ package main
 import "fmt"
 import "strings"
 import "os"
-import "io"
 import "runtime"
 
 import "executer/option"
@@ -53,10 +52,7 @@ func main() {
 		if util.IsFile(file) {
 
 			//checks if `./yrun.sh` is empty
-			var f, _ = os.Open(file)
-			defer f.Close()
-			var b, _ = io.ReadAll(f)
-			var lines = strings.Split(string(b), "\n")
+			var lines = util.ReadFileUnchecked(file)
 			var isYrunShEmpty = true
 			for _, line := range lines {
 				var l = strings.TrimSpace(line)
@@ -222,18 +218,41 @@ func main() {
 				o.ExecOptions = nil
 				exec.Execute(o)
 			} else { //normal files
-				var output = s.PathWoExt + ".out"
-				if !option.IsOnlyExecuteMode {
-					var o = createExecOption("go", true)
-					o.CompileOptions = append([]string{"build", "-o", output}, option.CompileArgs...)
-					o.ExecOptions = nil
-					exec.Execute(o)
-				}
-				if !option.IsOnlyCompileMode {
-					var o = createExecOption(output, false)
-					o.CompileOptions = nil
-					o.Arguments = nil
-					exec.Execute(o)
+				if util.IsFile("./go.mod") { //project
+					if !option.IsOnlyExecuteMode {
+						var o = createExecOption("go", true)
+						o.CompileOptions = append([]string{"build"}, option.CompileArgs...)
+						o.Arguments = nil
+						o.ExecOptions = nil
+						exec.Execute(o)
+					}
+					if !option.IsOnlyCompileMode && (s.Base == "main.go") {
+						var output = func() string {
+							var l = strings.Split(
+								util.ReadFileUnchecked("./go.mod")[0], //of the form `module <module name>`
+								" ",
+							)
+							return fmt.Sprintf("./%v", l[len(l)-1])
+						}()
+						var o = createExecOption(output, false)
+						o.CompileOptions = nil
+						o.Arguments = nil
+						exec.Execute(o)
+					}
+				} else { //non-project (unit file)
+					var output = s.PathWoExt + ".out"
+					if !option.IsOnlyExecuteMode {
+						var o = createExecOption("go", true)
+						o.CompileOptions = append([]string{"build", "-o", output}, option.CompileArgs...)
+						o.ExecOptions = nil
+						exec.Execute(o)
+					}
+					if !option.IsOnlyCompileMode {
+						var o = createExecOption(output, false)
+						o.CompileOptions = nil
+						o.Arguments = nil
+						exec.Execute(o)
+					}
 				}
 			}
 			os.Exit(0)

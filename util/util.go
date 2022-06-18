@@ -2,7 +2,9 @@ package util
 
 import "fmt"
 import "os"
+import "io"
 import "errors"
+import "strings"
 
 func Eprintln[T any](t T) {
 	fmt.Fprintln(os.Stderr, t)
@@ -35,4 +37,11 @@ func IsFile(path string) bool {
 		return true
 	}
 	return false
+}
+
+func ReadFileUnchecked(file string) []string {
+	var f, _ = os.Open(file)
+	defer f.Close()
+	var b, _ = io.ReadAll(f)
+	return strings.Split(string(b), "\n")
 }
