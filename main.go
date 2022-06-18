@@ -61,6 +61,13 @@ func main() {
 			os.Exit(0)
 		}
 
+	case "js":
+		{
+			var o = createExecOption("node", false)
+			exec.Execute(o)
+			os.Exit(0)
+		}
+
 	case "go":
 		{
 			if strings.HasSuffix(s.Base, "_test.go") { //test files
