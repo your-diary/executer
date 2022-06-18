@@ -10,11 +10,17 @@ func Test_misc(t *testing.T) {
 
 	t.Run("No option.", func(t *testing.T) {
 
+		//mock
+		var exitStatus int = -1
+		exit = func(i int) {
+			exitStatus = i
+		}
+
 		var args = []string{"$0"}
 
-		var ret, _ = Parse(args)
+		var _, _ = Parse(args)
 
-		if !(ret.Source.IsEmpty() && (ret.CompileArgs == nil) && (ret.ExecArgs == nil) && (ret.IsOnlyCompileMode == false) && (ret.IsOnlyExecuteMode == false) && (ret.ShouldMeasureTime == false)) {
+		if exitStatus != 0 {
 			t.FailNow()
 		}
 

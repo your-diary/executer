@@ -64,6 +64,11 @@ func Parse(args []string) (Options, error) {
 
 	var ret = Options{}
 
+	if len(args) == 1 {
+		printUsage()
+		exit(0)
+	}
+
 	var i = 0
 	for i < len(args)-1 {
 		i++
