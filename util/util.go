@@ -2,6 +2,7 @@ package util
 
 import "fmt"
 import "os"
+import "errors"
 
 func Eprintln[T any](t T) {
 	fmt.Fprintln(os.Stderr, t)
@@ -27,4 +28,11 @@ func ToStringPretty[T any](l []T) string {
 	}
 	ret += "]"
 	return ret
+}
+
+func IsFile(path string) bool {
+	if info, err := os.Stat(path); !errors.Is(err, os.ErrNotExist) && !info.IsDir() {
+		return true
+	}
+	return false
 }

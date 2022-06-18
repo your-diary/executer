@@ -2,7 +2,6 @@ package main
 
 import "fmt"
 import "strings"
-import "errors"
 import "os"
 import "io"
 import "runtime"
@@ -50,14 +49,8 @@ func main() {
 	//2. It isn't empty.
 	//3. It doesn't consist only of comments.
 	{
-		var isFile = func(path string) bool {
-			if info, err := os.Stat(path); !errors.Is(err, os.ErrNotExist) && !info.IsDir() {
-				return true
-			}
-			return false
-		}
 		var file = "./yrun.sh"
-		if isFile(file) {
+		if util.IsFile(file) {
 
 			//checks if `./yrun.sh` is empty
 			var f, _ = os.Open(file)
