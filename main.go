@@ -61,6 +61,14 @@ func main() {
 			os.Exit(0)
 		}
 
+	case "bats": //testing framework for Bash
+		{
+			var o = createExecOption("bats", false)
+			o.CompileOptions = append([]string{"--print-output-on-failure", "--show-output-of-passing-tests"}, o.CompileOptions...)
+			exec.Execute(o)
+			os.Exit(0)
+		}
+
 	case "js":
 		{
 			var o = createExecOption("node", false)
