@@ -4,6 +4,7 @@ import "fmt"
 import "strings"
 import "os"
 import "runtime"
+import "regexp"
 
 import "executer/option"
 import "executer/util"
@@ -228,11 +229,10 @@ func main() {
 					}
 					if !option.IsOnlyCompileMode && (s.Base == "main.go") {
 						var output = func() string {
-							var l = strings.Split(
-								util.ReadFileUnchecked("./go.mod")[0], //of the form `module <module name>`
-								" ",
-							)
-							return fmt.Sprintf("./%v", l[len(l)-1])
+							var moduleName = regexp.MustCompile(`^module (.*)$`).FindStringSubmatch(
+								util.ReadFileUnchecked("./go.mod")[0],
+							)[1]
+							return fmt.Sprintf("./%v", moduleName)
 						}()
 						var o = createExecOption(output, false)
 						o.CompileOptions = nil
