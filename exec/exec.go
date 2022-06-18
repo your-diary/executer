@@ -49,8 +49,6 @@ func Execute(o Option) {
 		util.DebugPrint(util.ToStringPretty(l), true)
 	}
 
-	//     var cmd = exec.Command("bash", "-c", "for i in $(seq 5); do echo ${i}; sleep 1; done")
-	//     var cmd = exec.Command("bash", "-c", "exit 150")
 	var cmd = exec.Command(o.Command, args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
