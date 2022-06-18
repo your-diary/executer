@@ -260,42 +260,38 @@ func main() {
 
 	case "rs":
 		{
-
+			if !util.IsFile("./Cargo.toml") {
+				util.Eprintln("`Cargo.toml` not found. `cd ..` in Vim may help.")
+				os.Exit(exitStatusWhenCompileError)
+			}
 			if s.Base == "main.rs" {
-
-				if option.IsOnlyCompileMode {
-
+				if !option.IsOnlyExecuteMode {
 					var o = createExecOption("cargo", true)
-					o.CompileOptions = append([]string{"check", "--quiet"}, option.CompileArgs...)
+					o.CompileOptions = append([]string{"build"}, option.CompileArgs...)
 					o.Arguments = nil
 					o.ExecOptions = nil
-
 					exec.Execute(o)
-
-				} else {
-
-					var o = createExecOption("cargo", false)
-					o.CompileOptions = append([]string{"run", "--quiet"}, option.CompileArgs...)
-					o.Arguments = nil
-					o.ExecOptions = option.ExecArgs
-
-					exec.Execute(o)
-
 				}
-
+				if !option.IsOnlyCompileMode {
+					var output = func() string {
+						var packageName = regexp.MustCompile(`^name = "(.*)"$`).FindStringSubmatch(
+							util.ReadFileUnchecked("./Cargo.toml")[1],
+						)[1]
+						return fmt.Sprintf("./target/debug/%v", packageName)
+					}()
+					var o = createExecOption(output, false)
+					o.CompileOptions = nil
+					o.Arguments = nil
+					exec.Execute(o)
+				}
 			} else {
-
 				var o = createExecOption("cargo", true)
 				o.CompileOptions = append([]string{"check", "--quiet"}, option.CompileArgs...)
 				o.Arguments = nil
 				o.ExecOptions = nil
-
 				exec.Execute(o)
-
 			}
-
 			os.Exit(0)
-
 		}
 
 	default:
