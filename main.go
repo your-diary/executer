@@ -2,7 +2,8 @@
 
 package main
 
-// import "fmt"
+import "fmt"
+import "strings"
 import "os"
 
 import "executer/option"
@@ -42,11 +43,9 @@ func main() {
 		}
 	}
 
-	var ext = option.Source.Ext
-	var base = option.Source.Base
-	var pathWoExt = option.Source.PathWoExt
+	var s = option.Source
 
-	switch ext {
+	switch s.Ext {
 
 	case "py":
 		{
@@ -64,18 +63,27 @@ func main() {
 
 	case "go":
 		{
-			var output = pathWoExt + ".out"
-			if !option.IsOnlyExecuteMode {
+			if strings.HasSuffix(s.Base, "_test.go") { //test files
+				var packageName = strings.Split(s.Base, "_")[0]
 				var o = createExecOption("go", true)
-				o.CompileOptions = append([]string{"build", "-o", output}, option.CompileArgs...)
+				o.CompileOptions = append([]string{"test", "--count=1", "-v", fmt.Sprintf("./%v", packageName)}, option.CompileArgs...)
+				o.Arguments = nil
 				o.ExecOptions = nil
 				exec.Execute(o)
-			}
-			if !option.IsOnlyCompileMode {
-				var o = createExecOption(output, false)
-				o.CompileOptions = nil
-				o.Arguments = nil
-				exec.Execute(o)
+			} else { //normal files
+				var output = s.PathWoExt + ".out"
+				if !option.IsOnlyExecuteMode {
+					var o = createExecOption("go", true)
+					o.CompileOptions = append([]string{"build", "-o", output}, option.CompileArgs...)
+					o.ExecOptions = nil
+					exec.Execute(o)
+				}
+				if !option.IsOnlyCompileMode {
+					var o = createExecOption(output, false)
+					o.CompileOptions = nil
+					o.Arguments = nil
+					exec.Execute(o)
+				}
 			}
 			os.Exit(0)
 		}
@@ -83,7 +91,7 @@ func main() {
 	case "rs":
 		{
 
-			if base == "main.rs" {
+			if s.Base == "main.rs" {
 
 				if option.IsOnlyCompileMode {
 
@@ -122,7 +130,7 @@ func main() {
 
 	default:
 		{
-			util.Eprintf("Unsupported file type: %v\n", ext)
+			util.Eprintf("Unsupported file type: %v\n", s.Ext)
 			os.Exit(exitStatusWhenCompileError)
 		}
 
