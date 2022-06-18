@@ -61,6 +61,14 @@ func main() {
 			os.Exit(0)
 		}
 
+	case "gp":
+		{
+			var o = createExecOption("gnuplot", false)
+			o.CompileOptions = append([]string{"--persist"}, o.CompileOptions...)
+			exec.Execute(o)
+			os.Exit(0)
+		}
+
 	case "bats": //testing framework for Bash
 		{
 			var o = createExecOption("bats", false)
