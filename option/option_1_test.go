@@ -14,7 +14,7 @@ func Test_misc(t *testing.T) {
 
 		var ret, _ = Parse(args)
 
-		if !((ret.Source == "") && (ret.CompileArgs == nil) && (ret.ExecArgs == nil) && (ret.IsOnlyCompileMode == false) && (ret.IsOnlyExecuteMode == false) && (ret.ShouldMeasureTime == false)) {
+		if !(ret.Source.IsEmpty() && (ret.CompileArgs == nil) && (ret.ExecArgs == nil) && (ret.IsOnlyCompileMode == false) && (ret.IsOnlyExecuteMode == false) && (ret.ShouldMeasureTime == false)) {
 			t.FailNow()
 		}
 
@@ -43,7 +43,7 @@ func Test_misc(t *testing.T) {
 			t.FailNow()
 		}
 
-		if !((ret.Source == "main.go") && slices.Equal(ret.ExecArgs, []string{"a", "b"}) && slices.Equal(ret.CompileArgs, []string{"c", "d"}) && (ret.IsOnlyCompileMode == true) && (ret.IsOnlyExecuteMode == true) && (ret.ShouldMeasureTime == true)) {
+		if !((ret.Source.Original == "main.go") && slices.Equal(ret.ExecArgs, []string{"a", "b"}) && slices.Equal(ret.CompileArgs, []string{"c", "d"}) && (ret.IsOnlyCompileMode == true) && (ret.IsOnlyExecuteMode == true) && (ret.ShouldMeasureTime == true)) {
 			t.FailNow()
 		}
 

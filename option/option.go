@@ -6,8 +6,10 @@ import "strings"
 
 import "golang.org/x/exp/slices"
 
+import "executer/source"
+
 type Options struct {
-	Source            string
+	Source            source.Source
 	CompileArgs       []string
 	ExecArgs          []string
 	IsOnlyCompileMode bool
@@ -91,15 +93,15 @@ func Parse(args []string) (Options, error) {
 			if strings.HasPrefix(arg, "-") {
 				return ret, fmt.Errorf("unknown option: [ %v ]", arg)
 			}
-			if ret.Source != "" {
+			if !ret.Source.IsEmpty() {
 				return ret, fmt.Errorf("more than one sources specified: [ %v, %v ]", ret.Source, arg)
 			}
-			ret.Source = arg
+			ret.Source = source.New(arg)
 
 		}
 	}
 
-	if ret.Source == "" {
+	if ret.Source.IsEmpty() {
 		return ret, fmt.Errorf("no source specified")
 	}
 

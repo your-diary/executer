@@ -5,15 +5,12 @@ package main
 // import "fmt"
 import "os"
 
-// import "strings"
-import "path"
-
 import "executer/option"
 import "executer/util"
 import "executer/exec"
 
 const (
-	isDebugModeDefault         = 0
+	isDebugModeDefault         = 1
 	exitStatusWhenCompileError = 100
 )
 
@@ -37,7 +34,7 @@ func main() {
 			IsCompileMode:              isCompileMode,
 			Command:                    command,
 			CompileOptions:             option.CompileArgs,
-			Arguments:                  []string{option.Source},
+			Arguments:                  []string{option.Source.Path},
 			ExecOptions:                option.ExecArgs,
 			ShouldMeasureTime:          option.ShouldMeasureTime,
 			ExitStatusWhenCompileError: exitStatusWhenCompileError,
@@ -45,26 +42,45 @@ func main() {
 		}
 	}
 
-	var ext = path.Ext(option.Source)   //`.py`
-	var base = path.Base(option.Source) //`main.py`
+	var ext = option.Source.Ext
+	var base = option.Source.Base
+	var pathWoExt = option.Source.PathWoExt
 
 	switch ext {
 
-	case ".py":
+	case "py":
 		{
 			var o = createExecOption("python3", false)
 			exec.Execute(o)
 			os.Exit(0)
 		}
 
-	case ".sh":
+	case "sh":
 		{
 			var o = createExecOption("bash", false)
 			exec.Execute(o)
 			os.Exit(0)
 		}
 
-	case ".rs":
+	case "go":
+		{
+			var output = pathWoExt + ".out"
+			if !option.IsOnlyExecuteMode {
+				var o = createExecOption("go", true)
+				o.CompileOptions = append([]string{"build", "-o", output}, option.CompileArgs...)
+				o.ExecOptions = nil
+				exec.Execute(o)
+			}
+			if !option.IsOnlyCompileMode {
+				var o = createExecOption(output, false)
+				o.CompileOptions = nil
+				o.Arguments = nil
+				exec.Execute(o)
+			}
+			os.Exit(0)
+		}
+
+	case "rs":
 		{
 
 			if base == "main.rs" {
