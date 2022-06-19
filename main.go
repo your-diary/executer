@@ -217,7 +217,7 @@ func main() {
 						os.Exit(exitStatusWhenCompileError)
 					}
 					var o = createExecOption("java", false)
-					o.CompileOptions = nil
+					o.CompileOptions = []string{"-enableassertions"}
 					o.Arguments = []string{fqcn}
 					exec.Execute(o)
 				}
@@ -229,7 +229,7 @@ func main() {
 				}
 				if !option.IsOnlyCompileMode {
 					var o = createExecOption("java", false)
-					o.CompileOptions = nil
+					o.CompileOptions = []string{"-enableassertions"}
 					o.Arguments = []string{s.Name}
 					exec.Execute(o)
 				}
