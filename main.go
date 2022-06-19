@@ -195,26 +195,44 @@ func main() {
 
 	case "java":
 		{
-			if option.IsOnlyCompileMode {
-				var o = createExecOption("gradle", true)
-				o.CompileOptions = append([]string{"build"}, option.CompileArgs...)
-				o.Arguments = nil
-				o.ExecOptions = nil
-				exec.Execute(o)
-			} else {
-				var o = createExecOption("gradle", false)
-				o.CompileOptions = append([]string{"run", "--quiet"}, option.CompileArgs...)
-				o.Arguments = nil
-				o.ExecOptions = func() []string { //To pass `a` and `b c`, we shall specify `['--args', '"a" "b c"']`.
-					if len(o.ExecOptions) == 0 {
-						return nil
+			if util.IsFile("./settings.gradle") { //project
+				if !option.IsOnlyExecuteMode {
+					var o = createExecOption("gradle", true)
+					o.CompileOptions = append([]string{"build", "--quiet"}, option.CompileArgs...)
+					o.Arguments = nil
+					o.ExecOptions = nil
+					exec.Execute(o)
+				}
+				if !option.IsOnlyCompileMode {
+					var fqcn = func() string {
+						var packageName = regexp.MustCompile(`package ([^;]+);`).FindStringSubmatch(
+							strings.Join(util.ReadFileUnchecked(s.Path), "\n"),
+						)[1]
+						return fmt.Sprintf("%v.%v", packageName, s.Name)
+					}()
+					var classFileDir = "./app/build/classes/java/main/"
+					var err = os.Chdir(classFileDir)
+					if err != nil {
+						util.Eprintf("Failed to execute `chdir(%v)`.\n", classFileDir)
+						os.Exit(exitStatusWhenCompileError)
 					}
-					for i := 0; i < len(o.ExecOptions); i++ {
-						o.ExecOptions[i] = fmt.Sprintf(`"%v"`, o.ExecOptions[i])
-					}
-					return []string{"--args", strings.Join(o.ExecOptions, " ")}
-				}()
-				exec.Execute(o)
+					var o = createExecOption("java", false)
+					o.CompileOptions = nil
+					o.Arguments = []string{fqcn}
+					exec.Execute(o)
+				}
+			} else { //non-project (unit file)
+				if !option.IsOnlyExecuteMode {
+					var o = createExecOption("javac", true)
+					o.ExecOptions = nil
+					exec.Execute(o)
+				}
+				if !option.IsOnlyCompileMode {
+					var o = createExecOption("java", false)
+					o.CompileOptions = nil
+					o.Arguments = []string{s.Name}
+					exec.Execute(o)
+				}
 			}
 			os.Exit(0)
 		}
