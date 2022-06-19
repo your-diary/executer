@@ -210,14 +210,12 @@ func main() {
 						)[1]
 						return fmt.Sprintf("%v.%v", packageName, s.Name)
 					}()
-					var classFileDir = "./app/build/classes/java/main/"
-					var err = os.Chdir(classFileDir)
-					if err != nil {
-						util.Eprintf("Failed to execute `chdir(%v)`.\n", classFileDir)
-						os.Exit(exitStatusWhenCompileError)
-					}
 					var o = createExecOption("java", false)
-					o.CompileOptions = []string{"-enableassertions"}
+					o.CompileOptions = []string{
+						"-enableassertions",
+						"--class-path",
+						"./app/build/classes/java/main:./app/build/classes/java/test/",
+					}
 					o.Arguments = []string{fqcn}
 					exec.Execute(o)
 				}
