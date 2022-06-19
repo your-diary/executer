@@ -6,6 +6,8 @@ import "os"
 import "runtime"
 import "regexp"
 
+import "github.com/mattn/go-isatty"
+
 import "executer/option"
 import "executer/util"
 import "executer/exec"
@@ -19,6 +21,10 @@ var isDebugMode = false
 
 func main() {
 
+	if isatty.IsTerminal(os.Stderr.Fd()) {
+		util.Eprintln("\u001B[1;034m==================================================================\u001B[0m")
+	}
+
 	if (isDebugModeDefault != 0) || (os.Getenv("EXECUTER_DEBUG") == "1") {
 		isDebugMode = true
 	}
@@ -29,6 +35,10 @@ func main() {
 		os.Exit(exitStatusWhenCompileError)
 	}
 	util.DebugPrint(option, isDebugMode)
+
+	if option.IsOnlyCompileMode {
+		util.Eprintln("\u001B[094mOnly-compile mode.\u001B[0m")
+	}
 
 	var createExecOption = func(command string, isCompileMode bool) exec.Option {
 		return exec.Option{
