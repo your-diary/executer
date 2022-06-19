@@ -14,6 +14,5 @@ $ ./executer --help
 ## History
 
 `executer` was originally written in C++, and then rewritten in Python, and now in Go.
-:qa
 
 <!-- vim: set spell: -->
