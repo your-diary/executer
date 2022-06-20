@@ -198,7 +198,7 @@ func main() {
 			if util.IsFile("./settings.gradle") { //project
 				if !option.IsOnlyExecuteMode {
 					var o = createExecOption("gradle", true)
-					o.CompileOptions = append([]string{"build", "--quiet"}, option.CompileArgs...)
+					o.CompileOptions = append([]string{"build", "--quiet", "--console", "plain"}, option.CompileArgs...)
 					o.Arguments = nil
 					o.ExecOptions = nil
 					exec.Execute(o)
