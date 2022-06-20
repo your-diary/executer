@@ -14,7 +14,7 @@ import "executer/exec"
 
 const (
 	isDebugModeDefault         = 0
-	exitStatusWhenCompileError = 100
+	exitStatusWhenCompileError = 180
 )
 
 var isDebugMode = false

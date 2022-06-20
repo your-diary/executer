@@ -81,7 +81,7 @@ func Execute(o Option) {
 
 	if err != nil {
 		var e *exec.ExitError
-		if errors.As(err, &e) {
+		if errors.As(err, &e) && !o.IsCompileMode {
 			exit(e.ProcessState.ExitCode())
 		} else {
 			exit(exitStatusOnFailure)
