@@ -142,18 +142,25 @@ func main() {
 
 	case "ts":
 		{
-			if !option.IsOnlyExecuteMode {
-				var o = createExecOption("tsc", true)
-				o.CompileOptions = append([]string{"--build"}, option.CompileArgs...)
+			if strings.HasSuffix(s.Original, "test.ts") {
+				var o = createExecOption("npm", false)
+				o.CompileOptions = append([]string{"test"}, o.CompileOptions...)
 				o.Arguments = nil
-				o.ExecOptions = nil
 				exec.Execute(o)
-			}
-			if !option.IsOnlyCompileMode {
-				var o = createExecOption("node", false)
-				o.CompileOptions = nil
-				o.Arguments = []string{fmt.Sprintf("%v/target/%v.js", s.Dir, s.Name)}
-				exec.Execute(o)
+			} else {
+				if !option.IsOnlyExecuteMode {
+					var o = createExecOption("tsc", true)
+					o.CompileOptions = append([]string{"--build"}, option.CompileArgs...)
+					o.Arguments = nil
+					o.ExecOptions = nil
+					exec.Execute(o)
+				}
+				if !option.IsOnlyCompileMode {
+					var o = createExecOption("node", false)
+					o.CompileOptions = nil
+					o.Arguments = []string{fmt.Sprintf("%v/target/%v.js", s.Dir, s.Name)}
+					exec.Execute(o)
+				}
 			}
 			os.Exit(0)
 		}
