@@ -133,6 +133,20 @@ func main() {
 			os.Exit(0)
 		}
 
+	case "awk":
+		{
+			var prog = strings.Join(util.ReadFileUnchecked(s.Path), "\n")
+			//We require there is a `BEGIN` block to avoid stdin's begin read.
+			if !strings.Contains(prog, "BEGIN {") {
+				util.Eprintln("The input doesn't include `BEGIN { ... }` block.")
+				os.Exit(exitStatusWhenCompileError)
+			}
+			var o = createExecOption("awk", false)
+			o.Arguments = []string{prog}
+			exec.Execute(o)
+			os.Exit(0)
+		}
+
 	case "js":
 		{
 			var o = createExecOption("node", false)
