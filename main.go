@@ -312,24 +312,32 @@ func main() {
 				os.Exit(exitStatusWhenCompileError)
 			}
 			if s.Base == "main.rs" {
-				if !option.IsOnlyExecuteMode {
+				if strings.Contains(s.Path, "/atcoder/") {
 					var o = createExecOption("cargo", true)
-					o.CompileOptions = append([]string{"build"}, option.CompileArgs...)
+					o.CompileOptions = append([]string{"test"}, option.CompileArgs...)
 					o.Arguments = nil
 					o.ExecOptions = nil
 					exec.Execute(o)
-				}
-				if !option.IsOnlyCompileMode {
-					var output = func() string {
-						var packageName = regexp.MustCompile(`^name = "(.*)"$`).FindStringSubmatch(
-							util.ReadFileUnchecked("./Cargo.toml")[1],
-						)[1]
-						return fmt.Sprintf("./target/debug/%v", packageName)
-					}()
-					var o = createExecOption(output, false)
-					o.CompileOptions = nil
-					o.Arguments = nil
-					exec.Execute(o)
+				} else {
+					if !option.IsOnlyExecuteMode {
+						var o = createExecOption("cargo", true)
+						o.CompileOptions = append([]string{"build"}, option.CompileArgs...)
+						o.Arguments = nil
+						o.ExecOptions = nil
+						exec.Execute(o)
+					}
+					if !option.IsOnlyCompileMode {
+						var output = func() string {
+							var packageName = regexp.MustCompile(`^name = "(.*)"$`).FindStringSubmatch(
+								util.ReadFileUnchecked("./Cargo.toml")[1],
+							)[1]
+							return fmt.Sprintf("./target/debug/%v", packageName)
+						}()
+						var o = createExecOption(output, false)
+						o.CompileOptions = nil
+						o.Arguments = nil
+						exec.Execute(o)
+					}
 				}
 			} else {
 				var o = createExecOption("cargo", true)
