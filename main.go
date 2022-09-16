@@ -313,6 +313,7 @@ func main() {
 			}
 			if s.Base == "main.rs" {
 				if strings.Contains(s.Path, "/atcoder/") {
+					os.Setenv("RUST_BACKTRACE", "0")
 					var o = createExecOption("cargo", true)
 					o.CompileOptions = append([]string{"test"}, option.CompileArgs...)
 					o.Arguments = nil
