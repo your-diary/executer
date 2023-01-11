@@ -90,7 +90,12 @@ func main() {
 
 	case "py":
 		{
-			var o = createExecOption("python3", false)
+			var o exec.Option
+			if runtime.GOOS == "darwin" {
+				o = createExecOption("python3.11", false)
+			} else {
+				o = createExecOption("python3", false)
+			}
 			exec.Execute(o)
 			os.Exit(0)
 		}
@@ -252,6 +257,24 @@ func main() {
 					o.Arguments = []string{s.Name}
 					exec.Execute(o)
 				}
+			}
+			os.Exit(0)
+		}
+
+	case "hs":
+		{
+			var output = s.PathWoExt + ".out"
+			if !option.IsOnlyExecuteMode {
+				var o = createExecOption("ghc", true)
+				o.CompileOptions = append([]string{"-v0", "-o", output}, option.CompileArgs...)
+				o.ExecOptions = nil
+				exec.Execute(o)
+			}
+			if !option.IsOnlyCompileMode {
+				var o = createExecOption(output, false)
+				o.CompileOptions = nil
+				o.Arguments = nil
+				exec.Execute(o)
 			}
 			os.Exit(0)
 		}
