@@ -1,16 +1,18 @@
 package main
 
-import "fmt"
-import "strings"
-import "os"
-import "runtime"
-import "regexp"
+import (
+	"executer/exec"
+	"executer/option"
+	"executer/util"
+	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
+	"runtime"
+	"strings"
 
-import "github.com/mattn/go-isatty"
-
-import "executer/option"
-import "executer/util"
-import "executer/exec"
+	"github.com/mattn/go-isatty"
+)
 
 const (
 	isDebugModeDefault         = 0
@@ -263,18 +265,36 @@ func main() {
 
 	case "hs":
 		{
-			var output = s.PathWoExt + ".out"
-			if !option.IsOnlyExecuteMode {
-				var o = createExecOption("ghc", true)
-				o.CompileOptions = append([]string{"-v0", "-o", output}, option.CompileArgs...)
-				o.ExecOptions = nil
-				exec.Execute(o)
-			}
-			if !option.IsOnlyCompileMode {
-				var o = createExecOption(output, false)
-				o.CompileOptions = nil
-				o.Arguments = nil
-				exec.Execute(o)
+			var cabalFiles, _ = filepath.Glob("*.cabal")
+			if cabalFiles != nil { //project
+				var packageName = regexp.MustCompile(`\.cabal$`).ReplaceAllString(cabalFiles[0], "")
+				if !option.IsOnlyExecuteMode {
+					var o = createExecOption("cabal", true)
+					o.CompileOptions = append([]string{"build", "-v0", "--ghc-options=-Wall"}, option.CompileArgs...)
+					o.Arguments = nil
+					o.ExecOptions = nil
+					exec.Execute(o)
+				}
+				if !option.IsOnlyCompileMode && (s.Base == "Main.hs") {
+					var o = createExecOption("cabal", false)
+					o.CompileOptions = []string{"exec", packageName}
+					o.Arguments = nil
+					exec.Execute(o)
+				}
+			} else {
+				var output = s.PathWoExt + ".out"
+				if !option.IsOnlyExecuteMode {
+					var o = createExecOption("ghc", true)
+					o.CompileOptions = append([]string{"-v0", "-o", output}, option.CompileArgs...)
+					o.ExecOptions = nil
+					exec.Execute(o)
+				}
+				if !option.IsOnlyCompileMode {
+					var o = createExecOption(output, false)
+					o.CompileOptions = nil
+					o.Arguments = nil
+					exec.Execute(o)
+				}
 			}
 			os.Exit(0)
 		}
