@@ -267,25 +267,33 @@ func main() {
 		{
 			var cabalFiles, _ = filepath.Glob("*.cabal")
 			if cabalFiles != nil { //project
-				var packageName = regexp.MustCompile(`\.cabal$`).ReplaceAllString(cabalFiles[0], "")
-				if !option.IsOnlyExecuteMode {
+				if strings.Contains(s.Path, "/test/") { //test files
 					var o = createExecOption("cabal", true)
-					o.CompileOptions = append([]string{"build", "-v0", "--ghc-options=-Wall"}, option.CompileArgs...)
+					o.CompileOptions = append([]string{"test", "-v0", "--test-show-details=streaming", "--test-option=--color", "--ghc-options=-Wall"}, option.CompileArgs...)
 					o.Arguments = nil
 					o.ExecOptions = nil
 					exec.Execute(o)
-				}
-				if !option.IsOnlyCompileMode && (s.Base == "Main.hs") {
-					var o = createExecOption("cabal", false)
-					o.CompileOptions = []string{"exec", packageName}
-					o.Arguments = nil
-					exec.Execute(o)
+				} else {
+					var packageName = regexp.MustCompile(`\.cabal$`).ReplaceAllString(cabalFiles[0], "")
+					if !option.IsOnlyExecuteMode {
+						var o = createExecOption("cabal", true)
+						o.CompileOptions = append([]string{"build", "-v0", "--ghc-options=-Wall"}, option.CompileArgs...)
+						o.Arguments = nil
+						o.ExecOptions = nil
+						exec.Execute(o)
+					}
+					if !option.IsOnlyCompileMode && (s.Base == "Main.hs") {
+						var o = createExecOption("cabal", false)
+						o.CompileOptions = []string{"exec", packageName}
+						o.Arguments = nil
+						exec.Execute(o)
+					}
 				}
 			} else {
 				var output = s.PathWoExt + ".out"
 				if !option.IsOnlyExecuteMode {
 					var o = createExecOption("ghc", true)
-					o.CompileOptions = append([]string{"-v0", "-o", output}, option.CompileArgs...)
+					o.CompileOptions = append([]string{"-v0", "-Wall", "-o", output}, option.CompileArgs...)
 					o.ExecOptions = nil
 					exec.Execute(o)
 				}
