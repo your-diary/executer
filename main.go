@@ -293,7 +293,7 @@ func main() {
 				var output = s.PathWoExt + ".out"
 				if !option.IsOnlyExecuteMode {
 					var o = createExecOption("ghc", true)
-					o.CompileOptions = append([]string{"-v0", "-Wall", "-o", output}, option.CompileArgs...)
+					o.CompileOptions = append([]string{"-v0", "-Wall", "-Wno-type-defaults", "-o", output}, option.CompileArgs...)
 					o.ExecOptions = nil
 					exec.Execute(o)
 				}
