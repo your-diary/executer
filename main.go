@@ -405,7 +405,7 @@ func main() {
 		{
 			if util.IsFile("./pubspec.yaml") { //project
 				var o = createExecOption("dart", true)
-				o.CompileOptions = append([]string{"run"}, option.CompileArgs...)
+				o.CompileOptions = append([]string{"run", "--enable-asserts"}, option.CompileArgs...)
 				o.Arguments = nil
 				o.ExecOptions = nil
 				exec.Execute(o)
