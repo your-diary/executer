@@ -403,25 +403,33 @@ func main() {
 
 	case "dart":
 		{
-			if util.IsFile("./pubspec.yaml") { //project
+			if strings.HasSuffix(s.Base, "_test.dart") { //test files
 				var o = createExecOption("dart", true)
-				o.CompileOptions = append([]string{"run", "--enable-asserts"}, option.CompileArgs...)
+				o.CompileOptions = append([]string{"test"}, option.CompileArgs...)
 				o.Arguments = nil
 				o.ExecOptions = nil
 				exec.Execute(o)
-			} else { //non-project (unit file)
-				var output = s.PathWoExt + ".out"
-				if !option.IsOnlyExecuteMode {
+			} else { //normal files
+				if util.IsFile("./pubspec.yaml") { //project
 					var o = createExecOption("dart", true)
-					o.CompileOptions = append([]string{"compile", "exe", "--verbosity", "warning", "-o", output}, option.CompileArgs...)
+					o.CompileOptions = append([]string{"run", "--enable-asserts"}, option.CompileArgs...)
+					o.Arguments = nil
 					o.ExecOptions = nil
 					exec.Execute(o)
-				}
-				if !option.IsOnlyCompileMode {
-					var o = createExecOption(output, false)
-					o.CompileOptions = nil
-					o.Arguments = nil
-					exec.Execute(o)
+				} else { //non-project (unit file)
+					var output = s.PathWoExt + ".out"
+					if !option.IsOnlyExecuteMode {
+						var o = createExecOption("dart", true)
+						o.CompileOptions = append([]string{"compile", "exe", "--verbosity", "warning", "-o", output}, option.CompileArgs...)
+						o.ExecOptions = nil
+						exec.Execute(o)
+					}
+					if !option.IsOnlyCompileMode {
+						var o = createExecOption(output, false)
+						o.CompileOptions = nil
+						o.Arguments = nil
+						exec.Execute(o)
+					}
 				}
 			}
 			os.Exit(0)
