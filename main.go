@@ -205,7 +205,7 @@ func main() {
 					return createExecOption("g++", true)
 
 				}()
-				o.CompileOptions = append([]string{"-fdiagnostics-color=always", "-Wno-unused-result", "-Wfatal-errors", "-o", output}, option.CompileArgs...)
+				o.CompileOptions = append([]string{"-fdiagnostics-color=always", "-Wfatal-errors", "-o", output}, option.CompileArgs...)
 				if s.Ext == "c" {
 					o.CompileOptions = append(o.CompileOptions, "-l", "m")
 				}
