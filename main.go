@@ -102,6 +102,13 @@ func main() {
 			os.Exit(0)
 		}
 
+	case "rb":
+		{
+			var o exec.Option = createExecOption("ruby", false)
+			exec.Execute(o)
+			os.Exit(0)
+		}
+
 	case "sh":
 		{
 			var o = createExecOption("bash", false)
