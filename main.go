@@ -201,9 +201,9 @@ func main() {
 
 					if runtime.GOOS == "darwin" {
 						if s.Ext == "c" {
-							return createExecOption("gcc-12", true)
+							return createExecOption("gcc-13", true)
 						}
-						return createExecOption("g++-12", true)
+						return createExecOption("g++-13", true)
 					}
 
 					if s.Ext == "c" {
